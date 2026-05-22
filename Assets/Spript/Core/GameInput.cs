@@ -11,6 +11,7 @@ public class GameInput : MonoBehaviour
     public Vector2 GetMovementVectorNormalized()
     {
         Vector2 inputDirction = _playerInputActions.Player.Move.ReadValue<Vector2>();
+        inputDirction = inputDirction.normalized;
         return inputDirction;
     }
 }
