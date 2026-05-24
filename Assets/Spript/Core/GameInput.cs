@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class GameInput : MonoBehaviour
 {
@@ -15,7 +14,7 @@ public class GameInput : MonoBehaviour
     }
     private void Interact_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
     {
-        Debug.Log(obj);
+        //Debug.Log(obj);
         OnInteractAction?.Invoke(this, EventArgs.Empty);
     }
     public Vector2 GetMovementVectorNormalized()
