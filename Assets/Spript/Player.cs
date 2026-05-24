@@ -1,12 +1,44 @@
+using System;
 using UnityEngine;
 
 public class Player : MonoBehaviour
-{
+{   
+
+    public static Player Instance
+    {
+        private set;
+        get;
+    }
+
+    public event EventHandler<OnSelectedCountChangeedEventArgs> OnSelectedCountChangeed;
+    public class OnSelectedCountChangeedEventArgs : EventArgs
+    {
+        public ClearCount selectedCounter;
+    }
+
     [SerializeField] private float _moveSpeed = 5f;
     [SerializeField] private float _rotateSpeed = 10f; 
     [SerializeField] private GameInput _gameInput;
+    [SerializeField] private LayerMask _counterLayerMask;
     private bool _isWalking;
-    
+    private Vector3 _lastInteractDir;
+    private ClearCount _selectedCount;
+    private void Awake()
+    {
+        if(Instance != null)
+        {
+            Debug.LogError("have more than One Player");
+        }
+        Instance = this;
+    }
+    private void Start()
+    {
+        _gameInput.OnInteractAction += GameInput_OnInteractAction;
+    }
+    private void GameInput_OnInteractAction(object sender, System.EventArgs e)
+    {
+        if(_selectedCount != null) _selectedCount.Interact();
+    }
     private void Update()
     {       
         HandleMovement();
@@ -26,10 +58,28 @@ public class Player : MonoBehaviour
             0f, 
             inputDirction.y
         );
-        float interactDistance = 2f;
-        if(Physics.Raycast(transform.position, moveDir, out RaycastHit raycastHit, interactDistance))
+        if(moveDir != Vector3.zero)
         {
-            Debug.Log(raycastHit.transform.position);
+            _lastInteractDir = moveDir;
+        }
+        float interactDistance = 2f;
+        if(Physics.Raycast(transform.position, _lastInteractDir, out RaycastHit raycastHit, interactDistance, _counterLayerMask))
+        {
+            if(raycastHit.transform.TryGetComponent(out ClearCount clearCount))
+            {//找到了ClearCount这个物体并且尝试获取ClearCount脚本信息
+                if(clearCount != _selectedCount)
+                {
+                    SetSelectedCounter(clearCount);
+                }
+            }
+            else
+            {//找到了ClearCount但是没有ClearCount这个物体脚本的信息
+                SetSelectedCounter(null);
+            }
+        }
+        else
+        {//射线没有找到ClearCount
+            SetSelectedCounter(null);
         }
     }
     private void HandleMovement()
@@ -107,5 +157,14 @@ public class Player : MonoBehaviour
         {//可以朝着这个方向移动
             transform.position += moveDir * moveDistance;
         }
+    }
+
+    private void SetSelectedCounter(ClearCount selectedCount)
+    {
+        _selectedCount = selectedCount;
+        OnSelectedCountChangeed?.Invoke(this, new OnSelectedCountChangeedEventArgs
+        {
+            selectedCounter = selectedCount
+        });
     }
 }
