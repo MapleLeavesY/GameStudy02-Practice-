@@ -1,38 +1,25 @@
 using UnityEngine;
 
-public class ClearCount : MonoBehaviour
+public class ClearCount : BaseCount, IKitchenObjectParent
 {
     [SerializeField] private Transform _countTopPoint;
     [SerializeField] private KitchenObjectSO _kitchenObjectSO;
-    [SerializeField] private ClearCount _secondClearCount;
-    [SerializeField] private bool testing;
+
 
     private KitchenObject _kitchenObject;
-    private void Update()
-    {
-        if(testing && Input.GetKeyDown(KeyCode.T))
-        {
-            if(_kitchenObject != null)
-            {
-                _kitchenObject.SetClearCounter(_secondClearCount);
-                Debug.Log(_kitchenObject.GetClearCounter());
-            }
-        }
-    }
-    public void Interact()
+
+    public override void Interact(Player player)
     {
         if(_kitchenObject == null)
         {
             Debug.Log("Interact!");
             Transform kitchenObjectTransform = Instantiate(_kitchenObjectSO.prefab, _countTopPoint);
-            kitchenObjectTransform.localPosition = Vector3.zero;
+            kitchenObjectTransform.GetComponent<KitchenObject>().SetKitchenObjectParent(this);
 
-            _kitchenObject = kitchenObjectTransform.GetComponent<KitchenObject>();
-            _kitchenObject.SetClearCounter(this);
         }
         else
-        {
-            Debug.Log(_kitchenObject.GetClearCounter());
+        {//玩家拿取物品
+           _kitchenObject.SetKitchenObjectParent(player);
         }
     }
     public Transform GetKitchenObjectFollowTransform()
@@ -43,7 +30,7 @@ public class ClearCount : MonoBehaviour
     {
         _kitchenObject = kitchenObject;
     }
-    public KitchenObject GetKitchenObject(KitchenObject kitchenObject)
+    public KitchenObject GetKitchenObject()
     {
         return _kitchenObject;
     }

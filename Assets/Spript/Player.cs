@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour,IKitchenObjectParent
 {   
 
     public static Player Instance
@@ -13,16 +13,18 @@ public class Player : MonoBehaviour
     public event EventHandler<OnSelectedCountChangeedEventArgs> OnSelectedCountChangeed;
     public class OnSelectedCountChangeedEventArgs : EventArgs
     {
-        public ClearCount selectedCounter;
+        public BaseCount selectedCounter;
     }
 
     [SerializeField] private float _moveSpeed = 5f;
     [SerializeField] private float _rotateSpeed = 10f; 
     [SerializeField] private GameInput _gameInput;
     [SerializeField] private LayerMask _counterLayerMask;
+    [SerializeField] private Transform _kitchenObjectHoldPoint;
     private bool _isWalking;
     private Vector3 _lastInteractDir;
-    private ClearCount _selectedCount;
+    private BaseCount _selectedCount;
+    private KitchenObject _kitchenObject;
     private void Awake()
     {
         if(Instance != null)
@@ -37,7 +39,7 @@ public class Player : MonoBehaviour
     }
     private void GameInput_OnInteractAction(object sender, System.EventArgs e)
     {
-        if(_selectedCount != null) _selectedCount.Interact();
+        if(_selectedCount != null) _selectedCount.Interact(this);
     }
     private void Update()
     {       
@@ -65,11 +67,11 @@ public class Player : MonoBehaviour
         float interactDistance = 2f;
         if(Physics.Raycast(transform.position, _lastInteractDir, out RaycastHit raycastHit, interactDistance, _counterLayerMask))
         {
-            if(raycastHit.transform.TryGetComponent(out ClearCount clearCount))
+            if(raycastHit.transform.TryGetComponent(out BaseCount baseCount))
             {//找到了ClearCount这个物体并且尝试获取ClearCount脚本信息
-                if(clearCount != _selectedCount)
+                if(baseCount != _selectedCount)
                 {
-                    SetSelectedCounter(clearCount);
+                    SetSelectedCounter(baseCount);
                 }
             }
             else
@@ -159,7 +161,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void SetSelectedCounter(ClearCount selectedCount)
+    private void SetSelectedCounter(BaseCount selectedCount)
     {
         _selectedCount = selectedCount;
         OnSelectedCountChangeed?.Invoke(this, new OnSelectedCountChangeedEventArgs
@@ -167,4 +169,27 @@ public class Player : MonoBehaviour
             selectedCounter = selectedCount
         });
     }
+
+
+    public Transform GetKitchenObjectFollowTransform()
+    {
+        return _kitchenObjectHoldPoint;
+    }
+    public void SetKitchenObject(KitchenObject kitchenObject)
+    {
+        _kitchenObject = kitchenObject;
+    }
+    public KitchenObject GetKitchenObject()
+    {
+        return _kitchenObject;
+    }
+    public void ClearKitchenObject()
+    {
+        _kitchenObject = null;
+    }
+    public bool HasKitchenObject()
+    {
+        return _kitchenObject != null;
+    }
+
 }
