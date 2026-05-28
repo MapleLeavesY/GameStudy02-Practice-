@@ -1,10 +1,8 @@
+
 using UnityEngine;
 
-public class ClearCount : BaseCount, IKitchenObjectParent
+public class CuttingCount : BaseCount
 {
-    [SerializeField] private KitchenObjectSO _kitchenObjectSO;
-
-
     public override void Interact(Player player)
     {
         if(!HasKitchenObject())
@@ -25,7 +23,12 @@ public class ClearCount : BaseCount, IKitchenObjectParent
                 GetKitchenObject().SetKitchenObjectParent(player);
             }
         }
-
     }
-    
+    public override void InteractAlternate(Player player)
+    {
+        if(HasKitchenObject())
+        {//There is a KitchenObject here
+            GetKitchenObject().DestroySelf();
+        }
+    }
 }

@@ -36,10 +36,15 @@ public class Player : MonoBehaviour,IKitchenObjectParent
     private void Start()
     {
         _gameInput.OnInteractAction += GameInput_OnInteractAction;
+        _gameInput.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
     }
-    private void GameInput_OnInteractAction(object sender, System.EventArgs e)
+    private void GameInput_OnInteractAction(object sender, EventArgs e)
     {
         if(_selectedCount != null) _selectedCount.Interact(this);
+    }
+    private void GameInput_OnInteractAlternateAction(object sender, EventArgs e)
+    {
+        if(_selectedCount != null) _selectedCount.InteractAlternate(this);
     }
     private void Update()
     {       
@@ -121,7 +126,7 @@ public class Player : MonoBehaviour,IKitchenObjectParent
                 0f,
                 0f
             ).normalized;
-            canMove = !Physics.CapsuleCast
+            canMove = moveDir.x != 0 && !Physics.CapsuleCast
             (
                 transform.position,
                 transform.position + Vector3.up * playerHeight,
@@ -141,7 +146,7 @@ public class Player : MonoBehaviour,IKitchenObjectParent
                     0f,
                     moveDir.z
                 ).normalized;
-                canMove = !Physics.CapsuleCast
+                canMove = moveDir.z != 0 && !Physics.CapsuleCast
                 (
                     transform.position,
                     transform.position + Vector3.up * playerHeight,
