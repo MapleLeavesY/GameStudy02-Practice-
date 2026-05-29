@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ClearCountVisual : MonoBehaviour
+public class SelectCountVisual : MonoBehaviour
 {
     [SerializeField] private BaseCount _baseCount;
     [SerializeField] private GameObject[] _visualGameObjectArray;

@@ -11,6 +11,7 @@ public class CuttingCount : BaseCount
     {
         public float progressNormalized;
     }
+    public event EventHandler OnCut;
     public override void Interact(Player player)
     {
         if(!HasKitchenObject())
@@ -49,6 +50,8 @@ public class CuttingCount : BaseCount
         {//There is a KitchenObject here And Can be Cut
             _cuttingProgress++;
 
+            OnCut.Invoke(this, EventArgs.Empty);
+
             CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeWithInput(GetKitchenObject().GetKitchenObjectSO());
 
             OnProgressChanged.Invoke(this, new OnProgressChangedEventArgs
@@ -75,7 +78,7 @@ public class CuttingCount : BaseCount
         CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeWithInput(inputKitchenObjectSO);
         if(cuttingRecipeSO != null)
         {
-            return cuttingRecipeSO.output;;
+            return cuttingRecipeSO.output;
         }
         else
         {
