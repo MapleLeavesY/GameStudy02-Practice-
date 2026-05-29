@@ -1,7 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.Playables;
 
 public class ContainCount : BaseCount, IKitchenObjectParent
 {
@@ -13,8 +11,7 @@ public class ContainCount : BaseCount, IKitchenObjectParent
     {
         if(!player.HasKitchenObject())
         {//Player not carring anything
-            Transform kitchenObjectTransform = Instantiate(_kitchenObjectSO.prefab);
-            kitchenObjectTransform.GetComponent<KitchenObject>().SetKitchenObjectParent(player);
+            KitchenObject.SpawnKitchenObject(_kitchenObjectSO, player);
             OnPlayerGrabbedObject?.Invoke(this, EventArgs.Empty);
         }
             

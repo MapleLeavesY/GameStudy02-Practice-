@@ -1,34 +1,97 @@
 
+using System;
 using UnityEngine;
 
 public class CuttingCount : BaseCount
-{
+{ 
+    [SerializeField] private CuttingRecipeSO[] _cuttingRecipeSOArray;
+    private int _cuttingProgress;
+    public event EventHandler<OnProgressChangedEventArgs> OnProgressChanged;
+    public class OnProgressChangedEventArgs : EventArgs
+    {
+        public float progressNormalized;
+    }
     public override void Interact(Player player)
     {
         if(!HasKitchenObject())
         {//Not have KitchenObject here
             if(player.HasKitchenObject())
-            {//Player Carring KitchenObject
-                player.GetKitchenObject().SetKitchenObjectParent(this);
+            {//Player Carrying KitchenObject
+                if(HasRecipeWithInput(player.GetKitchenObject().GetKitchenObjectSO()))
+                {//Player carrying something Can Cuting KitchenObject
+                    player.GetKitchenObject().SetKitchenObjectParent(this);
+                    _cuttingProgress = 0;
+
+                    CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeWithInput(GetKitchenObject().GetKitchenObjectSO());
+
+                    OnProgressChanged.Invoke(this, new OnProgressChangedEventArgs
+                    {
+                        progressNormalized = (float)_cuttingProgress / cuttingRecipeSO.cuttingProgressMax
+                    });
+                }
             }
         }
         else
         {//There is a KitchenObject here
             if(player.HasKitchenObject())
-            {//Player is Carring something
+            {//Player is Carrying something
                 
             }
             else
-            {//Player is not Carring something
+            {//Player is not Carrying something
                 GetKitchenObject().SetKitchenObjectParent(player);
             }
         }
     }
     public override void InteractAlternate(Player player)
     {
-        if(HasKitchenObject())
-        {//There is a KitchenObject here
-            GetKitchenObject().DestroySelf();
+        if(HasKitchenObject() && HasRecipeWithInput(GetKitchenObject().GetKitchenObjectSO()))
+        {//There is a KitchenObject here And Can be Cut
+            _cuttingProgress++;
+
+            CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeWithInput(GetKitchenObject().GetKitchenObjectSO());
+
+            OnProgressChanged.Invoke(this, new OnProgressChangedEventArgs
+            {
+                progressNormalized = (float)_cuttingProgress / cuttingRecipeSO.cuttingProgressMax
+            });
+
+            if(_cuttingProgress >= cuttingRecipeSO.cuttingProgressMax)
+            {
+                KitchenObjectSO kitchenObjectSO = GetOutputForInput(GetKitchenObject().GetKitchenObjectSO());
+                GetKitchenObject().DestroySelf();
+
+                KitchenObject.SpawnKitchenObject(kitchenObjectSO, this);
+            }
         }
+    }
+    private bool HasRecipeWithInput(KitchenObjectSO inputKitchenObjectSO)
+    {
+        CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeWithInput(inputKitchenObjectSO);
+        return cuttingRecipeSO != null;
+    }
+    private KitchenObjectSO GetOutputForInput(KitchenObjectSO inputKitchenObjectSO)
+    {
+        CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeWithInput(inputKitchenObjectSO);
+        if(cuttingRecipeSO != null)
+        {
+            return cuttingRecipeSO.output;;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private CuttingRecipeSO GetCuttingRecipeWithInput(KitchenObjectSO inputKitchenObjectSO)
+    {
+        foreach(CuttingRecipeSO cuttingRecipeSO in _cuttingRecipeSOArray)
+        {
+            if(cuttingRecipeSO.input == inputKitchenObjectSO)
+            {
+                return cuttingRecipeSO;
+            }
+        }
+        return null;
     }
 }
