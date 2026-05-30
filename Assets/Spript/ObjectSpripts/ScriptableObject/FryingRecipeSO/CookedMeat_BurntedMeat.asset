@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df41a45e842a6d24386c69b7d220db7e, type: 3}
-  m_Name: CookedMeat_BurntMeat
+  m_Script: {fileID: 11500000, guid: ff79106169afd3c45933f95deb23088b, type: 3}
+  m_Name: CookedMeat_BurntedMeat
   m_EditorClassIdentifier: 
-  input: {fileID: 11400000, guid: fc77bd55cfe526940aacd0d9622618d5, type: 2}
-  output: {fileID: 11400000, guid: b498ef389ba92c64faef640df2d85940, type: 2}
-  FryingtimerMax: 0
+  input: {fileID: 0}
+  output: {fileID: 0}
+  BurntTimerMax: 0
