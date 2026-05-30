@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ClearCount : BaseCount, IKitchenObjectParent
+public class ClearCount : BaseCount
 {
     [SerializeField] private KitchenObjectSO _kitchenObjectSO;
 
@@ -18,7 +18,16 @@ public class ClearCount : BaseCount, IKitchenObjectParent
         {//There is a KitchenObject here
             if(player.HasKitchenObject())
             {//Player is Carring something
-                
+                if(player.GetKitchenObject() is PlateKitchenObject)
+                {// Player is holding a Plate
+                     PlateKitchenObject plateKitchenObject = player.GetKitchenObject() as PlateKitchenObject;
+
+                     if(plateKitchenObject.TryAddIngredient(GetKitchenObject().GetKitchenObjectSO()))
+                    {
+                        GetKitchenObject().DestroySelf();
+                    }
+
+                }
             }
             else
             {//Player is not Carring something
